@@ -1,5 +1,6 @@
 # java-zjh-utils
 炸金花工具类
+[jar文件下载](https://github.com/wdh-1025/java-zjh-utils/raw/master/jar/zjh.0.0.1.jar)
 传入或者自定义牌需要遵循此规则，需花色跟牌保持跟工具类一样，通过以下方法可获得；
 ``` java
 // 获取整副牌的花色，从大到小
