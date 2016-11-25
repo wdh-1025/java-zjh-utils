@@ -9,13 +9,9 @@ String[] HS = ZJHUtils.getInstance().HS;
 // 获取整副牌的牌，从大到小
 String[] pat = ZJHUtils.getInstance().pat;
 ```
-* 获取所有牌型组合结果，并按从大到小排序，第一次调用的时候稍微慢一点，100毫秒左右，第二次5毫秒左右，不过一般只需要调用一次；
+* 获取牌型的绝对大小，注意"0"为最大；PS：最好放在子线程调用；
 ``` java
-ZJHUtils.getInstance().getResultsPats(new ResultsCallBack() {
-	@Override
-	public void results(String resultsPats) {
-	}
-});
+ZJHUtils.getInstance().getPatTypePosition("黑桃A", "红桃A", "梅花A");
 ```
 * 获取随机牌
 ``` java

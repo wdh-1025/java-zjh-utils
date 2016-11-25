@@ -1,6 +1,8 @@
 package com.zjh;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -33,7 +35,11 @@ public class ZJHUtils {
 	/**
 	 * 所有结果牌 3张为一个结果，并按从大到小顺序排列好的牌，全部为22100个结果
 	 */
-	private List<String> resultsPats = new ArrayList<>();
+	private Map<String, Integer> resultsPosition = new HashMap<>();// 牌型结果位置
+	/**
+	 * 有多少种类型
+	 */
+	private Integer typeSize = 0;
 	/**
 	 * 豹子集合，从大到小
 	 */
@@ -83,79 +89,61 @@ public class ZJHUtils {
 	}
 
 	/**
-	 * 获取22100种牌型 52*51*50/(3*2*1) 五张的话则是52*51*50*49*48/(5*4*3*2*1) 耗时操作，加入子线程执行
+	 * 获取22100种牌型 52*51*50/(3*2*1) 五张的话则是52*51*50*49*48/(5*4*3*2*1)
+	 * 耗时操作，调用者自己加入子线程
 	 */
-	public void getResultsPats(ResultsCallBack resultsCallback) {
-		new Thread(new Runnable() {
-			@Override
-			public void run() {
-				if (resultsPats.size() > 0) {
-					resultsPats(resultsCallback);
-				} else {
-					for (int i = 0; i <= 49; i++) {
-						for (int j = i + 1; j <= 50; j++) {
-							for (int k = j + 1; k <= 51; k++) {
-								String pata = pats.get(i);
-								String patb = pats.get(j);
-								String patc = pats.get(k);
-								if (ISBZ(pata, patb, patc)) {
-									BZ.add(pata + "-" + patb + "-" + patc);
-								} else if (ISTHS(pata, patb, patc)) {
-									THS.add(pata + "-" + patb + "-" + patc);
-								} else if (ISTH(pata, patb, patc)) {
-									TH.add(pata + "-" + patb + "-" + patc);
-								} else if (ISSZ(pata, patb, patc)) {
-									SZ.add(pata + "-" + patb + "-" + patc);
-								} else if (ISDZ(pata, patb, patc)) {
-									DZ.add(pata + "-" + patb + "-" + patc);
-								} else {
-									SP.add(pata + "-" + patb + "-" + patc);
-								}
-							}
-						}
-					}
-					// 按照游戏规则
-					if (resultsCallback != null) {
-						for (int i = 0; i < BZ.size(); i++) {
-							resultsPats.add(BZ.get(i));
-							resultsCallback.results(BZ.get(i));
-						}
-						for (int i = 0; i < THS.size(); i++) {
-							resultsPats.add(THS.get(i));
-							resultsCallback.results(THS.get(i));
-						}
-						for (int i = 0; i < TH.size(); i++) {
-							resultsPats.add(TH.get(i));
-							resultsCallback.results(TH.get(i));
-						}
-						for (int i = 0; i < SZ.size(); i++) {
-							resultsPats.add(SZ.get(i));
-							resultsCallback.results(SZ.get(i));
-						}
-						for (int i = 0; i < DZ.size(); i++) {
-							resultsPats.add(DZ.get(i));
-							resultsCallback.results(DZ.get(i));
-						}
-						for (int i = 0; i < SP.size(); i++) {
-							resultsPats.add(SP.get(i));
-							resultsCallback.results(SP.get(i));
+	private Map<String, Integer> getResultsPats() {
+		if (resultsPosition.size() > 0) {
+			return resultsPosition;
+		} else {
+			for (int i = 0; i <= 49; i++) {
+				for (int j = i + 1; j <= 50; j++) {
+					for (int k = j + 1; k <= 51; k++) {
+						String pata = pats.get(i);
+						String patb = pats.get(j);
+						String patc = pats.get(k);
+						if (ISBZ(pata, patb, patc)) {
+							BZ.add(pata + "-" + patb + "-" + patc);
+						} else if (ISTHS(pata, patb, patc)) {
+							THS.add(pata + "-" + patb + "-" + patc);
+						} else if (ISTH(pata, patb, patc)) {
+							TH.add(pata + "-" + patb + "-" + patc);
+						} else if (ISSZ(pata, patb, patc)) {
+							SZ.add(pata + "-" + patb + "-" + patc);
+						} else if (ISDZ(pata, patb, patc)) {
+							DZ.add(pata + "-" + patb + "-" + patc);
+						} else {
+							SP.add(pata + "-" + patb + "-" + patc);
 						}
 					}
 				}
 			}
-		}).start();
-	}
-
-	/**
-	 * 如果已经遍历过了就直接调了，不过正常情况下只需要调用一次而已
-	 * 
-	 * @param resultsCallback
-	 */
-	private void resultsPats(ResultsCallBack resultsCallback) {
-		if (resultsCallback != null) {
-			for (int i = 0; i < resultsPats.size(); i++) {
-				resultsCallback.results(resultsPats.get(i));
+			// 按照游戏规则
+			for (int i = 0; i < BZ.size(); i++) {
+				resultsPosition.put(BZ.get(i), typeSize);
+				typeSize++;
 			}
+			for (int i = 0; i < THS.size(); i++) {
+				resultsPosition.put(THS.get(i), typeSize);
+				typeSize++;
+			}
+			for (int i = 0; i < TH.size(); i++) {
+				resultsPosition.put(TH.get(i), typeSize);
+				typeSize++;
+			}
+			for (int i = 0; i < SZ.size(); i++) {
+				resultsPosition.put(SZ.get(i), typeSize);
+				typeSize++;
+			}
+			for (int i = 0; i < DZ.size(); i++) {
+				resultsPosition.put(DZ.get(i), typeSize);
+				typeSize++;
+			}
+			for (int i = 0; i < SP.size(); i++) {
+				resultsPosition.put(SP.get(i), typeSize);
+				typeSize++;
+			}
+			return resultsPosition;
 		}
 	}
 
@@ -304,7 +292,7 @@ public class ZJHUtils {
 	}
 
 	/**
-	 * 获取52张牌随意一张的
+	 * 获取52张牌随意一张的绝对大小位置
 	 * 
 	 * @param pat
 	 * @return
@@ -312,6 +300,28 @@ public class ZJHUtils {
 	public int getPatPositon(String pat) {
 		try {
 			return patPosition.get(pat);
+		} catch (Exception e) {
+			return -1;
+		}
+	}
+
+	/**
+	 * 获取一组牌型的绝对大小
+	 * 
+	 * @param pats
+	 * @return
+	 */
+	public int getPatTypePosition(String... pats) {
+		try {
+			if (resultsPosition.size() == 0) {
+				getResultsPats();
+			}
+			if (pats != null && pats.length == 3) {
+				String patStr = PatSort(pats);
+				return resultsPosition.get(patStr);
+			} else {
+				return -1;
+			}
 		} catch (Exception e) {
 			return -1;
 		}
@@ -337,6 +347,30 @@ public class ZJHUtils {
 		} else {
 			return null;
 		}
+	}
+
+	/**
+	 * 把牌型从大到小排序并直接返回拼接好的字符串
+	 * 
+	 * @param pats
+	 * @return
+	 */
+	private String PatSort(String... pats) {
+		// String[] newPats = new String[pats.length];
+		String patStr = "";
+		Integer[] patsPositon = new Integer[pats.length];
+		Map<Integer, String> patsMap = new HashMap<>();
+		for (int i = 0; i < pats.length; i++) {
+			patsPositon[i] = getPatPositon(pats[i]);
+			patsMap.put(patsPositon[i], pats[i]);
+		}
+		Arrays.sort(patsPositon);// 对其从小到大排序,因为下面，遍历要返回从大到小，所以这里相反，按从小到大
+		for (int i = 0; i < patsPositon.length; i++) {
+			// newPats[i] = patsMap.get(patsPositon[i]);
+			patStr += patsMap.get(patsPositon[i]) + "-";
+		}
+		patStr = patStr.substring(0, patStr.length() - 1);
+		return patStr;
 	}
 
 	/**
