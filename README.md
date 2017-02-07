@@ -1,6 +1,6 @@
 # java-zjh-utils
 
-炸金花工具类(有bug，暂时停止维护)
+炸金花工具类
 
 [jar文件下载](https://github.com/wdh-1025/java-zjh-utils/raw/master/jar/zjh.0.0.1.jar)
 
